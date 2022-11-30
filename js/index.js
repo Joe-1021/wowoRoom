@@ -155,8 +155,8 @@ function deleteAllCartList(){
 
 //刪除單一品項按鈕
 cartList.addEventListener('click',e=>{
-    const deleteSingle=e.target.getAttribute('class')
-    if(deleteSingle!=='material-icons'){
+    const deleteSingleClass=e.target.getAttribute('class')
+    if(deleteSingleClass!=='material-icons'){
         return
     }
     const deleteItem = e.target.getAttribute('data-delete');
