@@ -1,6 +1,6 @@
 const getProductDataUrl='https://livejs-api.hexschool.io/api/livejs/v1/customer/yoyo/products';
 const getCartUrl='https://livejs-api.hexschool.io/api/livejs/v1/customer/yoyo/carts';
-
+const getOrderUrl='https://livejs-api.hexschool.io/api/livejs/v1/customer/yoyo/orders';
 
 
 //取得產品資料
@@ -128,6 +128,7 @@ function addCartItem(id){
         }
         ).then(res=>{
         getCartData();
+        alert('加入成功')
     }).catch(err=>{
         console.log(err)
     })
@@ -172,3 +173,44 @@ function deleteSingle(id){
         console.log(err);
     })
 }
+
+//資料驗證
+const form = document.querySelector('.orderInfo-form');
+const inputs = document.querySelectorAll('input[id]');
+const txt = document.querySelectorAll('[data-message]');
+const payMethod = document.querySelector('#tradeWay');
+const submit = document.querySelector('.orderInfo-btn');
+
+submit.addEventListener('click',e=>{
+    e.preventDefault();
+    txt.forEach((item,index)=>{
+        if(inputs[index].value===''){
+            item.textContent = `${item.dataset.message}必填`
+        }else{
+            item.textContent=''
+        }
+    })
+    submitOrder();
+})
+
+//送出訂單
+function submitOrder(){
+    axios.post(getOrderUrl,{
+        "data": {
+            "user": {
+              "name": inputs[0].value,
+              "tel": inputs[1].value,
+              "email": inputs[2].value,
+              "address": inputs[3].value,
+              "payment": payMethod.value,
+            }
+          }
+    }).then(res=>{
+        getCartData();
+        form.reset();
+        alert('訂單送出成功');
+    }).catch(err=>{
+        alert(err.response.data.message);
+    })
+}
+
