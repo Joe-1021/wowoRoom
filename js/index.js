@@ -8,14 +8,14 @@ let data=[];
 axios.get(getProductDataUrl).then(res=>{
     // console.log(res.data.products)
     data=res.data.products;
-    renderData();
+    renderData(data);
 }).catch(err=>{
     console.log(err)
 })
 
 //渲染
 let productList = document.querySelector('.productWrap');
-function renderData(){
+function renderData(data){
     let str='';
     data.forEach(item=>{
         str+=`<li class="productCard">
@@ -214,3 +214,14 @@ function submitOrder(){
     })
 }
 
+//分類
+const select = document.querySelector('.productSelect');
+select.addEventListener('change',e=>{
+    let targetProducts=[]
+    if(e.target.value==='全部'){
+        targetProducts=data
+    }else{
+        targetProducts=data.filter(i=>i.category===e.target.value)
+    }
+    renderData(targetProducts)
+})
