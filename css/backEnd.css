@@ -793,7 +793,8 @@ body {
 .orderStatus a {
   padding: 10px;
   display: block;
-  color: #0067CE;
+  /* color: #0067CE; */
+  text-decoration: none;
 }
 
 .orderTableWrap {
