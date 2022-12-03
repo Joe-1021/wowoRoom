@@ -1,6 +1,11 @@
 const api_path = "yoyo";
 const token = "7huWgaeAO3ZOfefPyI9IxCrpg1P2";
 
+function init(){
+    getOrderData();
+}
+init();
+
 //訂單列表
 const orderList = document.querySelector('.orderList');
 let orderData=[];
@@ -12,11 +17,12 @@ function getOrderData(){
     }).then(res=>{
         orderData = res.data.orders;
         getOrderList();
+        renderC3();
     }).catch(err=>{
         console.log(err)
     })
 }
-getOrderData();
+
 
 function getOrderList(){
     let orderListStr='';
@@ -71,17 +77,20 @@ orderList.addEventListener('click',e=>{
     e.preventDefault();
     let id = e.target.getAttribute('data-id');
     const targetClass = e.target.getAttribute('class');
+    //修改訂單
     if(targetClass=='js-orderStatus'){
         // console.log('點擊到訂單狀態');
         let status = e.target.getAttribute('data-status');
         changeOrderStatus(status,id);
         return;
     }
+    //刪除訂單
     if(targetClass=='delSingleOrder-Btn orderDelete'){
         // console.log('點擊到刪除訂單');
         deleteOrderItem(id);
         return;
     }
+    
 })
 
 //修改訂單狀態
@@ -89,11 +98,12 @@ function changeOrderStatus(status,id){
     // console.log(status,id);
     let newStatus=''
     if(status ==true){
-        newStatus=false;
+        newStatus=false; 
     }else{
-        newStatus=true
-    }
-
+        newStatus=true;
+    } 
+    
+    
     axios.put(`https://livejs-api.hexschool.io/api/livejs/v1/admin/${api_path}/orders`,{
         'data':{
             'id':id,
@@ -127,24 +137,61 @@ function deleteOrderItem(id){
     })
 }
 
+//刪除全部
+const deleteAll = document.querySelector('.discardAllBtn');
+deleteAll.addEventListener('click',(e)=>{
+    e.preventDefault()
+    axios.delete(`https://livejs-api.hexschool.io/api/livejs/v1/admin/${api_path}/orders`,
+    {
+        headers:{
+            'Authorization':token,
+        }
+    }).then(res=>{
+        alert('刪除全部訂單成功');
+        getOrderData();
+    }).catch(err=>{
+        console.log(err)
+    })
+})
 
 
 // C3.js
-let chart = c3.generate({
-    bindto: '#chart', // HTML 元素綁定
-    data: {
-        type: "pie",
-        columns: [
-        ['Louvre 雙人床架', 1],
-        ['Antony 雙人床架', 2],
-        ['Anty 雙人床架', 3],
-        ['其他', 4],
-        ],
-        colors:{
-            "Louvre 雙人床架":"#DACBFF",
-            "Antony 雙人床架":"#9D7FEA",
-            "Anty 雙人床架": "#5434A7",
-            "其他": "#301E5F",
-        }
-    },
-});
+function renderC3(){
+    let total={};
+    orderData.forEach(i=>{
+        i.products.forEach(productItem=>{
+            if(total[productItem.category]==undefined){
+                total[productItem.category]=productItem.price * productItem.quantity;
+            }else{
+                total[productItem.category]+=productItem.price * productItem.quantity;
+            }
+        })
+    })
+    // console.log(total);
+    let categoryAry = Object.keys(total);
+    // console.log(categoryAry);
+    let newData=[];
+    categoryAry.forEach(i=>{
+        let ary=[];
+        ary.push(i);
+        ary.push(total[i]);
+        newData.push(ary);
+        // console.log(newData)
+    })
+
+    let chart = c3.generate({
+        bindto: '#chart', // HTML 元素綁定
+        data: {
+            type: "pie",
+            columns: newData,
+            colors:{
+                "Louvre 雙人床架":"#DACBFF",
+                "Antony 雙人床架":"#9D7FEA",
+                "Anty 雙人床架": "#5434A7",
+                "其他": "#301E5F",
+            }
+        },
+    });
+
+}
+

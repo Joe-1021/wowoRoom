@@ -23,8 +23,8 @@ function renderData(data){
                 <img src="${item.images}" alt="">
                 <a href="#shoppingCart" class="addCardBtn" data-id='${item.id}'>加入購物車 </a>
                 <h3>${item.title}</h3>
-                <del class="originPrice">${item.origin_price}</del>
-                <p class="nowPrice">${item.price}</p>
+                <del class="originPrice">NT$ ${toThousands(item.origin_price)}</del>
+                <p class="nowPrice">NT$ ${toThousands(item.price)}</p>
             </li>`
     });
     productList.innerHTML=str;
@@ -62,16 +62,16 @@ function getCartlist(){
             <p>${item.product.title}</p>
         </div>
     </td>
-    <td>${item.product.price}</td>
+    <td>NT$ ${toThousands(item.product.price)}</td>
     <td>${item.quantity}</td>
-    <td>${item.product.price*item.quantity}</td>
+    <td>NT$ ${toThousands(item.product.price*item.quantity)}</td>
     <td class="discardBtn">
         <a href="#shoppingCart" class="material-icons" data-delete='${item.id}'>
             clear
         </a>
     </td>
     </tr>`
-    totalPrice +=item.product.price * item.quantity;
+    totalPrice += item.product.price * item.quantity;
     })
 
     let CartTableStr=`<tr>
@@ -91,7 +91,7 @@ function getCartlist(){
         <td>
             <p>總金額</p>
         </td>
-        <td>NT$ ${totalPrice}</td>
+        <td>NT$ ${toThousands(totalPrice)}</td>
     </tr>
     `;
     cartList.innerHTML=CartTableStr;
@@ -99,6 +99,7 @@ function getCartlist(){
 
 //加入購物車按鈕
 productList.addEventListener('click',e=>{
+    e.preventDefault();
     const addCartClass=e.target.getAttribute('class');
     // console.log(addCartClass);
     if(addCartClass!=='addCardBtn'){
@@ -136,6 +137,7 @@ function addCartItem(id){
 
 //刪除所有品項按鈕
 cartList.addEventListener('click',e=>{
+    e.preventDefault();
     const deleteAll=e.target.getAttribute('class')
     if(deleteAll!=='discardAllBtn'){
         return
@@ -156,6 +158,7 @@ function deleteAllCartList(){
 
 //刪除單一品項按鈕
 cartList.addEventListener('click',e=>{
+    e.preventDefault();
     const deleteSingleClass=e.target.getAttribute('class')
     if(deleteSingleClass!=='material-icons'){
         return
@@ -163,7 +166,7 @@ cartList.addEventListener('click',e=>{
     const deleteItem = e.target.getAttribute('data-delete');
     deleteSingle(deleteItem);
 })
-
+//刪除單一品項
 function deleteSingle(id){
     const deleteSingleUrl=`https://livejs-api.hexschool.io/api/livejs/v1/customer/yoyo/carts/${id}`;
     axios.delete(deleteSingleUrl).then(res=>{
@@ -225,3 +228,12 @@ select.addEventListener('change',e=>{
     }
     renderData(targetProducts)
 })
+
+
+
+//千分位
+function toThousands(x){
+    let parts = x.toString().split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');
+    return parts.join('.');
+}
