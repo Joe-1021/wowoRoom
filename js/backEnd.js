@@ -72,12 +72,15 @@ function getOrderList(){
     orderList.innerHTML = orderListStr;
     
     //訂單狀態顏色
-    let statusColor = document.querySelector('.js-orderStatus');
-    if(statusColor.textContent==='已付款'){
-        statusColor.style.color='green' 
-    }else{
-        statusColor.style.color='red'
-    }
+    let statusColor = document.querySelectorAll('.js-orderStatus');
+    statusColor.forEach(i=>{
+        if(i.textContent==='已付款'){
+            i.style.color='green' 
+        }else{
+            i.style.color='red'
+        }
+    })
+    
 }
 
 //訂單列表按鈕
