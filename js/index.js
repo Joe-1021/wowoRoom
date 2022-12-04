@@ -63,7 +63,13 @@ function getCartlist(){
         </div>
     </td>
     <td>NT$ ${toThousands(item.product.price)}</td>
-    <td>${item.quantity}</td>
+    <td>
+        <div class="productNum">
+            <a href="#"><span class="material-icons cartAmount-icon" data-num="${item.quantity - 1}" data-id="${item.id}">remove</span></a>
+            <span>${item.quantity}</span>
+            <a href="#"><span class="material-icons cartAmount-icon" data-num="${item.quantity + 1}" data-id="${item.id}">add</span></a>
+        </div>    
+    </td>
     <td>NT$ ${toThousands(item.product.price*item.quantity)}</td>
     <td class="discardBtn">
         <a href="#shoppingCart" class="material-icons" data-delete='${item.id}'>
@@ -95,7 +101,38 @@ function getCartlist(){
     </tr>
     `;
     cartList.innerHTML=CartTableStr;
+
+    //數量按鈕
+    let productNum = document.querySelectorAll('.cartAmount-icon');
+    productNum.forEach(i=>{
+        i.addEventListener('click',e=>{
+            e.preventDefault();
+            let num = e.target.dataset.num;
+            let id = e.target.dataset.id
+            changeNum(num,id)
+        })
+    })
 }
+
+//變更數量
+function changeNum(num,id){
+    if(num>0){
+        let data = {
+            'data':{
+                'id':id,
+                'quantity':parseInt(num),
+            }
+        }
+        axios.patch(getCartUrl,data).then(res=>{
+            getCartData();
+        }).catch(err=>{
+            console.log(err)
+        })
+    }else{
+        deleteSingle(id)
+    }
+}
+
 
 //加入購物車按鈕
 productList.addEventListener('click',e=>{

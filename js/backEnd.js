@@ -36,11 +36,9 @@ function getOrderList(){
         //訂單狀態
         let orderStatus='';
         if(i.paid==true){
-            orderStatus='已付款'; 
-            // statusColor.style.color='green' 
+            orderStatus='已付款';
         }else{
-            orderStatus='未付款'
-            // statusColor.style.color='red'
+            orderStatus='未付款'      
         }
 
         //時間轉換
@@ -106,9 +104,7 @@ orderList.addEventListener('click',e=>{
 //修改訂單狀態
 function changeOrderStatus(status,id){
     // console.log(status,id);
-    let newStatus;
-    // let statusColor = document.querySelector('.js-orderStatus');
-    // console.log(statusColor)
+    let newStatus=''
     if(status =='true'){
         newStatus=false; 
     }else{

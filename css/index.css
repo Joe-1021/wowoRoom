@@ -839,3 +839,11 @@ body {
   font-size: 20px !important;
   font-weight: bold;
 }
+
+.productNum{
+  display:flex;
+  align-items: center;
+}
+.cartAmount-icon {
+  padding: 10px;
+}
