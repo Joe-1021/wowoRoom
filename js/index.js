@@ -1,11 +1,11 @@
-const getProductDataUrl='https://livejs-api.hexschool.io/api/livejs/v1/customer/yoyo/products';
-const getCartUrl='https://livejs-api.hexschool.io/api/livejs/v1/customer/yoyo/carts';
-const getOrderUrl='https://livejs-api.hexschool.io/api/livejs/v1/customer/yoyo/orders';
+const ProductDataUrl='https://livejs-api.hexschool.io/api/livejs/v1/customer/yoyo/products';
+const CartUrl='https://livejs-api.hexschool.io/api/livejs/v1/customer/yoyo/carts';
+const OrderUrl='https://livejs-api.hexschool.io/api/livejs/v1/customer/yoyo/orders';
 
 
 //取得產品資料
 let data=[];
-axios.get(getProductDataUrl).then(res=>{
+axios.get(ProductDataUrl).then(res=>{
     // console.log(res.data.products)
     data=res.data.products;
     renderData(data);
@@ -35,7 +35,7 @@ const cartList = document.querySelector('.shoppingCart-table');
 let cartData=[]
 
 function getCartData(){
-    axios.get(getCartUrl).then(res=>{
+    axios.get(CartUrl).then(res=>{
     // console.log(res.data.carts);
     cartData = res.data.carts;
     getCartlist();
@@ -120,10 +120,10 @@ function changeNum(num,id){
         let data = {
             'data':{
                 'id':id,
-                'quantity':parseInt(num),
+                'quantity':parseInt(num,10),
             }
         }
-        axios.patch(getCartUrl,data).then(res=>{
+        axios.patch(CartUrl,data).then(res=>{
             getCartData();
         }).catch(err=>{
             console.log(err)
@@ -157,7 +157,7 @@ function addCartItem(id){
             productNum = i.quantity +=1;
         }
     })
-    axios.post(getCartUrl,
+    axios.post(CartUrl,
         {
             'data':{
                 "productId": id,
@@ -185,7 +185,7 @@ cartList.addEventListener('click',e=>{
 
 //刪除全部
 function deleteAllCartList(){
-    axios.delete(getCartUrl).then(res=>{
+    axios.delete(CartUrl).then(res=>{
         alert('全部刪除成功');
         getCartData();
     }).catch(err=>{
@@ -215,27 +215,82 @@ function deleteSingle(id){
 }
 
 //資料驗證
-const form = document.querySelector('.orderInfo-form');
-const inputs = document.querySelectorAll('input[id]');
-const txt = document.querySelectorAll('[data-message]');
+const form = document.querySelector('.orderInfo-form');//validate.js用
+// const inputs = document.querySelectorAll('input[id]');
+// const txt = document.querySelectorAll('[data-message]');
 const payMethod = document.querySelector('#tradeWay');
 const submit = document.querySelector('.orderInfo-btn');
 
-submit.addEventListener('click',e=>{
-    e.preventDefault();
-    txt.forEach((item,index)=>{
-        if(inputs[index].value===''){
-            item.textContent = `${item.dataset.message}必填`
-        }else{
-            item.textContent=''
+// submit.addEventListener('click',e=>{
+//     e.preventDefault();
+//     txt.forEach((item,index)=>{
+//         if(inputs[index].value===''){
+//             item.textContent = `${item.dataset.message}必填`
+//         }else{
+//             item.textContent=''
+//         }
+//     })
+//     submitOrder();
+// })
+
+
+//資料驗證2 validate.js
+const inputs = document.querySelectorAll('input[type=text],input[type=tel],input[type=email]')
+// console.log(inputs)
+const constraints = {
+    姓名:{
+        presence:{
+            message:'必填'
         }
-    })
-    submitOrder();
-})
+    },
+    電話:{
+        presence:{
+            message:'必填'
+        },
+        numericality:{
+            onlyInteger: true, // 只能是整數
+        }
+    },
+    Email:{
+        presence:{
+            message:'必填'
+        },
+        email:true
+    },
+    寄送地址:{
+        presence:{
+            message:'必填'
+        }
+    }
+}
+
+const formValidate = ()=>{
+    //先清空警告訊息
+    inputs.forEach(i=>{
+        i.nextElementSibling.textContent='';
+    });
+    //執行驗證
+    const errors = validate(form,constraints);
+
+    //如果表單輸入有誤，則顯示警告訊息
+    if(errors){
+        const keys = Object.keys(errors);
+        console.log(keys)
+        const values = Object.values(errors);
+
+        keys.forEach((item,index)=>{
+            document.querySelector(`[data-message="${item}"]`).textContent = values[index]
+        });
+    }else{
+        submitOrder();
+    }
+}
+
+submit.addEventListener('click',formValidate)
 
 //送出訂單
 function submitOrder(){
-    axios.post(getOrderUrl,{
+    axios.post(OrderUrl,{
         "data": {
             "user": {
               "name": inputs[0].value,
@@ -250,7 +305,7 @@ function submitOrder(){
         form.reset();
         alert('訂單送出成功');
     }).catch(err=>{
-        alert(err.response.data.message);
+        alert('資料不得空白');
     })
 }
 
