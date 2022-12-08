@@ -215,11 +215,11 @@ function deleteSingle(id){
 }
 
 //資料驗證
-const form = document.querySelector('.orderInfo-form');//validate.js用
+// const form = document.querySelector('.orderInfo-form'); //reset用
 // const inputs = document.querySelectorAll('input[id]');
 // const txt = document.querySelectorAll('[data-message]');
-const payMethod = document.querySelector('#tradeWay');
-const submit = document.querySelector('.orderInfo-btn');
+// const payMethod = document.querySelector('#tradeWay');
+// const submit = document.querySelector('.orderInfo-btn');
 
 // submit.addEventListener('click',e=>{
 //     e.preventDefault();
@@ -235,6 +235,8 @@ const submit = document.querySelector('.orderInfo-btn');
 
 
 //資料驗證2 validate.js
+const form = document.querySelector('.orderInfo-form');//validate.js用
+const submit = document.querySelector('.orderInfo-btn');
 const inputs = document.querySelectorAll('input[type=text],input[type=tel],input[type=email]')
 // console.log(inputs)
 const constraints = {
@@ -249,22 +251,33 @@ const constraints = {
         },
         numericality:{
             onlyInteger: true, // 只能是整數
-        }
+            message:'號碼必須是數字',
+        },
+        length: {
+            minimum: 9, // 輸入值不能短於此值
+            maximum: 10, // 輸入值不能長於此值
+            message:'如果是市話必須為9碼(需含區域碼)'
+          }
     },
     Email:{
         presence:{
             message:'必填'
         },
-        email:true
+        email:{
+            email:true,
+            message:'必須符合格式'
+        }
     },
     寄送地址:{
         presence:{
             message:'必填'
         }
+        
     }
 }
 
-const formValidate = ()=>{
+const formValidate = (e)=>{
+    e.preventDefault();
     //先清空警告訊息
     inputs.forEach(i=>{
         i.nextElementSibling.textContent='';
@@ -272,10 +285,10 @@ const formValidate = ()=>{
     //執行驗證
     const errors = validate(form,constraints);
 
-    //如果表單輸入有誤，則顯示警告訊息
+    //如果表單輸入有誤，顯示警告訊息
     if(errors){
         const keys = Object.keys(errors);
-        console.log(keys)
+        // console.log(keys)
         const values = Object.values(errors);
 
         keys.forEach((item,index)=>{
@@ -289,6 +302,8 @@ const formValidate = ()=>{
 submit.addEventListener('click',formValidate)
 
 //送出訂單
+const payMethod = document.querySelector('#tradeWay');
+
 function submitOrder(){
     axios.post(OrderUrl,{
         "data": {
